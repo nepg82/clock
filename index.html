@@ -62,10 +62,7 @@
     transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
-    justify-content: center;
-    /* width/height/transform are set by JS (layoutFrame) using
-       real measured viewport pixels — more reliable on mobile
-       than vh/vw units combined with a CSS rotate transform. */
+    justify-content: flex-end;
   }
 
   #clock {
@@ -167,7 +164,7 @@
     <div id="clock"><span id="hh">12</span><span id="colon">:</span><span id="mm">00</span></div>
   </div>
 </div>
-<div id="debug-tag">260911-1255</div>
+<div id="debug-tag">260911-1258</div>
 <button id="rotate-btn" aria-label="Toggle forced landscape">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M17 1l4 4-4 4"></path>
