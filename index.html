@@ -145,6 +145,18 @@
     right: 18px;
     top: 18px;
   }
+  
+  #debug-tag {
+    position: fixed;
+    top: 6px;
+    left: 6px;
+    font-family: monospace;
+    font-size: 11px;
+    color: #ffffff;
+    mix-blend-mode: difference;
+    z-index: 20;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -154,7 +166,7 @@
     <div id="clock"><span id="hh">12</span><span id="colon">:</span><span id="mm">00</span></div>
   </div>
 </div>
-version 260911-1057
+<div id="debug-tag">260911-1202</div>
 <button id="rotate-btn" aria-label="Toggle forced landscape">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M17 1l4 4-4 4"></path>
@@ -226,6 +238,9 @@ version 260911-1057
 
   window.addEventListener('resize', refresh);
   window.addEventListener('orientationchange', refresh);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', refresh);
+  }
 
   // Tick every second so the minute change is never more than 1s late,
   // without doing wasted layout work when nothing visible changed.
