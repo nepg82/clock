@@ -119,6 +119,25 @@
     color: rgba(255, 255, 255, 0.85);
   }
 
+  body.inverted #stage {
+    background: #ffffff;
+  }
+
+  body.inverted #clock {
+    color: #000000;
+  }
+
+  body.inverted #rotate-btn {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.18);
+    color: rgba(0, 0, 0, 0.55);
+  }
+
+  body.inverted #rotate-btn:active {
+    background: rgba(0, 0, 0, 0.16);
+    color: rgba(0, 0, 0, 0.85);
+  }
+
   #rotate-btn svg {
     width: 22px;
     height: 22px;
@@ -158,6 +177,9 @@
   const frameEl = document.getElementById('frame');
   const stageEl = document.getElementById('stage');
   const rotateBtn = document.getElementById('rotate-btn');
+    stageEl.addEventListener('click', () => {
+    document.body.classList.toggle('inverted');
+  });
 
   function updateClock() {
     const now = new Date();
