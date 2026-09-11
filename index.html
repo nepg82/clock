@@ -155,7 +155,8 @@
     color: #ffffff;
     mix-blend-mode: difference;
     z-index: 20;
-    pointer-events: none;
+    pointer-events: auto;
+    padding: 4px;
   }
 </style>
 </head>
@@ -234,6 +235,19 @@
   rotateBtn.addEventListener('click', () => {
     document.body.classList.toggle('force-landscape');
     refresh();
+  });
+  
+    document.getElementById('debug-tag').addEventListener('click', async (e) => {
+    e.stopPropagation(); // don't also trigger the invert-colors tap on #stage
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+    if (window.caches) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+    }
+    location.reload();
   });
 
   window.addEventListener('resize', refresh);
