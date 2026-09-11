@@ -85,9 +85,13 @@
     font-size: 10vw; /* overwritten by JS fit calculation */
   }
 
-  #ampm {
-    display: inline-block;
-    margin-left: 0.12em;
+  #colon {
+    animation: blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50%, 100% { opacity: 0; }
+    0%, 49.99% { opacity: 1; }
   }
 
   #rotate-btn {
@@ -134,7 +138,7 @@
 
 <div id="stage">
   <div id="frame">
-    <div id="clock"><span id="time">12:00</span><span id="ampm">AM</span></div>
+    <div id="clock"><span id="hh">12</span><span id="colon">:</span><span id="mm">00</span></div>
   </div>
 </div>
 
@@ -148,8 +152,8 @@
 </button>
 
 <script>
-  const timeEl = document.getElementById('time');
-  const ampmEl = document.getElementById('ampm');
+  const hhEl = document.getElementById('hh');
+  const mmEl = document.getElementById('mm');
   const clockEl = document.getElementById('clock');
   const frameEl = document.getElementById('frame');
   const stageEl = document.getElementById('stage');
@@ -159,12 +163,10 @@
     const now = new Date();
     let h = now.getHours();
     const m = now.getMinutes();
-    const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12;
     if (h === 0) h = 12;
-    const mm = String(m).padStart(2, '0');
-    timeEl.textContent = h + ':' + mm;
-    ampmEl.textContent = ampm;
+    hhEl.textContent = h;
+    mmEl.textContent = String(m).padStart(2, '0');
   }
 
   function fitClock() {
