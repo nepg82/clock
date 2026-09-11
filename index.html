@@ -184,13 +184,16 @@
     stageEl.addEventListener('click', () => {
     document.body.classList.toggle('inverted');
   });
+  const HOUR_FORMAT_24 = false; // set to true for 24hr mode, false for 12hr
 
   function updateClock() {
     const now = new Date();
     let h = now.getHours();
     const m = now.getMinutes();
-    h = h % 12;
-    if (h === 0) h = 12;
+    if (!HOUR_FORMAT_24) {
+      h = h % 12;
+      if (h === 0) h = 12;
+    }
     hhEl.textContent = h;
     mmEl.textContent = String(m).padStart(2, '0');
   }
