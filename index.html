@@ -167,7 +167,7 @@
     <div id="clock"><span id="hh">12</span><span id="colon">:</span><span id="mm">00</span></div>
   </div>
 </div>
-<div id="debug-tag">260911-1240</div>
+<div id="debug-tag">260911-1246</div>
 <button id="rotate-btn" aria-label="Toggle forced landscape">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M17 1l4 4-4 4"></path>
@@ -213,8 +213,8 @@
   function fitClock() {
     // The available box is the frame's own box (it already accounts
     // for the rotated/unrotated dimensions via CSS).
-    const availW = frameEl.clientWidth * 0.90;
-    const availH = frameEl.clientHeight * 0.82;
+    const availW = frameEl.clientWidth * 0.98;
+    const availH = frameEl.clientHeight * 0.95;
 
     // Font scales ~linearly with font-size, so one measurement at a
     // reference size gives us the scale factor directly.
