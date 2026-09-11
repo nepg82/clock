@@ -215,8 +215,7 @@ version 260911-1057
 
   function refresh() {
     updateClock();
-    // Wait a frame so layout settles (especially right after a
-    // rotation toggle) before measuring.
+    layoutFrame();
     requestAnimationFrame(fitClock);
   }
 
