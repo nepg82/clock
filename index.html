@@ -185,6 +185,17 @@ version 260911-1057
     mmEl.textContent = String(m).padStart(2, '0');
   }
 
+  function layoutFrame() {
+    const vw = window.visualViewport ? window.visualViewport.width : window.innerWidth;
+    const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const rotated = document.body.classList.contains('force-landscape');
+    frameEl.style.width = (rotated ? vh : vw) + 'px';
+    frameEl.style.height = (rotated ? vw : vh) + 'px';
+    frameEl.style.transform = rotated
+      ? 'translate(-50%, -50%) rotate(90deg)'
+      : 'translate(-50%, -50%)';
+  }
+  
   function fitClock() {
     // The available box is the frame's own box (it already accounts
     // for the rotated/unrotated dimensions via CSS).
