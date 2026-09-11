@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Clock</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="app-icons/app-icon-192.png">
+<link rel="icon" href="app-icons/app-icon-192.png">
+
+<style>
+  @font-face {
+    font-family: 'DSEG14';
+    src: url('font/dseg14classic_italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    color-scheme: dark;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+    touch-action: manipulation;
+  }
+
+  /* #stage is always the visual viewport-sized box.
+     #frame is what gets rotated inside it. */
+  #stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+  }
+
+  #frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Force-landscape mode: rotate the frame 90deg and swap its
+     dimensions to match, so it fills the physically-portrait screen. */
+  body.force-landscape #frame {
+    width: 100vh;
+    height: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  #clock {
+    font-family: 'DSEG14', monospace;
+    font-style: italic;
+    font-weight: normal;
+    color: #ffffff;
+    white-space: nowrap;
+    line-height: 1;
+    text-align: center;
+    font-size: 10vw; /* overwritten by JS fit calculation */
+  }
+
+  #ampm {
+    display: inline-block;
+    margin-left: 0.12em;
+  }
+
+  #rotate-btn {
+    position: fixed;
+    bottom: 18px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    -webkit-appearance: none;
+    appearance: none;
+    padding: 0;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  #rotate-btn:active {
+    background: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  #rotate-btn svg {
+    width: 22px;
+    height: 22px;
+    pointer-events: none;
+  }
+
+  /* Keep the button pinned to the same physical bottom-right
+     corner of the phone even while the frame is rotated. */
+  body.force-landscape #rotate-btn {
+    bottom: auto;
+    right: 18px;
+    top: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="frame">
+    <div id="clock"><span id="time">12:00</span><span id="ampm">AM</span></div>
+  </div>
+</div>
+
+<button id="rotate-btn" aria-label="Toggle forced landscape">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M17 1l4 4-4 4"></path>
+    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+    <path d="M7 23l-4-4 4-4"></path>
+    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+  </svg>
+</button>
+
+<script>
+  const timeEl = document.getElementById('time');
+  const ampmEl = document.getElementById('ampm');
+  const clockEl = document.getElementById('clock');
+  const frameEl = document.getElementById('frame');
+  const stageEl = document.getElementById('stage');
+  const rotateBtn = document.getElementById('rotate-btn');
+
+  function updateClock() {
+    const now = new Date();
+    let h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    if (h === 0) h = 12;
+    const mm = String(m).padStart(2, '0');
+    timeEl.textContent = h + ':' + mm;
+    ampmEl.textContent = ampm;
+  }
+
+  function fitClock() {
+    // The available box is the frame's own box (it already accounts
+    // for the rotated/unrotated dimensions via CSS).
+    const availW = frameEl.clientWidth * 0.90;
+    const availH = frameEl.clientHeight * 0.82;
+
+    // Font scales ~linearly with font-size, so one measurement at a
+    // reference size gives us the scale factor directly.
+    const refSize = 400;
+    clockEl.style.fontSize = refSize + 'px';
+    const rect = clockEl.getBoundingClientRect();
+
+    const scale = Math.min(availW / rect.width, availH / rect.height);
+    const finalSize = Math.max(20, Math.floor(refSize * scale));
+    clockEl.style.fontSize = finalSize + 'px';
+  }
+
+  function refresh() {
+    updateClock();
+    // Wait a frame so layout settles (especially right after a
+    // rotation toggle) before measuring.
+    requestAnimationFrame(fitClock);
+  }
+
+  rotateBtn.addEventListener('click', () => {
+    document.body.classList.toggle('force-landscape');
+    refresh();
+  });
+
+  window.addEventListener('resize', refresh);
+  window.addEventListener('orientationchange', refresh);
+
+  // Tick every second so the minute change is never more than 1s late,
+  // without doing wasted layout work when nothing visible changed.
+  let lastMinuteKey = '';
+  setInterval(() => {
+    const now = new Date();
+    const key = now.getHours() + ':' + now.getMinutes();
+    if (key !== lastMinuteKey) {
+      lastMinuteKey = key;
+      refresh();
+    }
+  }, 1000);
+
+  // Try to keep the screen awake while the clock is open, where supported.
+  let wakeLock = null;
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    } catch (e) {
+      // Not supported or denied — fine, clock still works.
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestWakeLock();
+  });
+  requestWakeLock();
+
+  refresh();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
