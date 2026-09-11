@@ -143,6 +143,19 @@
     top: 18px;
   }
   
+    #clock-sizer {
+    font-family: 'DSEG14', monospace;
+    font-style: italic;
+    font-weight: normal;
+    white-space: nowrap;
+    line-height: 1;
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+  }
+  
   #debug-tag {
     position: fixed;
     top: 6px;
@@ -165,9 +178,12 @@
 <div id="stage">
   <div id="frame">
     <div id="clock"><span id="hh">12</span><span id="colon">:</span><span id="mm">00</span></div>
+    <div id="clock-sizer" aria-hidden="true"></div>
   </div>
 </div>
+<!-- DEBUG -->
 <div id="debug-tag">260911-1500</div>
+<!-- DEBUG -->
 <button id="rotate-btn" aria-label="Toggle forced landscape">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M17 1l4 4-4 4"></path>
@@ -188,6 +204,8 @@
     document.body.classList.toggle('inverted');
   });
   const HOUR_FORMAT_24 = false; // set to true for 24hr mode, false for 12hr
+  const sizerEl = document.getElementById('clock-sizer');
+  sizerEl.textContent = HOUR_FORMAT_24 ? '23:59' : '12:59';
 
   function updateClock() {
     const now = new Date();
@@ -223,7 +241,7 @@
     // reference size gives us the scale factor directly.
     const refSize = 400;
     clockEl.style.fontSize = refSize + 'px';
-    const rect = clockEl.getBoundingClientRect();
+    const rect = sizerEl.getBoundingClientRect();
 
     const scale = Math.min(availW / rect.width, availH / rect.height);
     const finalSize = Math.max(20, Math.floor(refSize * scale));
