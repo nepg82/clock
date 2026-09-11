@@ -57,25 +57,15 @@
   
   #frame {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  /* Force-landscape mode: rotate the frame 90deg and swap its
-     dimensions to match, so it fills the physically-portrait screen. */
-  body.force-landscape #frame {
-    width: 100vh;
-    height: 100vw;
-    width: 100dvh;
-    height: 100dvw;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(90deg);
+    /* width/height/transform are set by JS (layoutFrame) using
+       real measured viewport pixels — more reliable on mobile
+       than vh/vw units combined with a CSS rotate transform. */
   }
 
   #clock {
