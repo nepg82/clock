@@ -201,7 +201,8 @@
   function layoutFrame() {
     const vw = window.visualViewport ? window.visualViewport.width : window.innerWidth;
     const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    const rotated = document.body.classList.contains('force-landscape');
+    const nativeLock = document.body.classList.contains('native-lock');
+    const rotated = document.body.classList.contains('force-landscape') && !nativeLock;
     frameEl.style.width = (rotated ? vh : vw) + 'px';
     frameEl.style.height = (rotated ? vw : vh) + 'px';
     frameEl.style.transform = rotated
@@ -232,11 +233,45 @@
     requestAnimationFrame(fitClock);
   }
 
-  rotateBtn.addEventListener('click', () => {
-    document.body.classList.toggle('force-landscape');
+  async function enterForcedLandscape() {
+    try {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      }
+      if (screen.orientation && screen.orientation.lock) {
+        await screen.orientation.lock('landscape');
+        return true; // real OS-level rotation succeeded
+      }
+    } catch (e) {
+      // not supported / denied — fall through to CSS fallback
+    }
+    return false;
+  }
+
+  async function exitForcedLandscape() {
+    try {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+      if (document.fullscreenElement && document.exitFullscreen) {
+        await document.exitFullscreen();
+      }
+    } catch (e) {}
+  }
+
+  rotateBtn.addEventListener('click', async () => {
+    const turningOn = !document.body.classList.contains('force-landscape');
+    if (turningOn) {
+      const locked = await enterForcedLandscape();
+      document.body.classList.add('force-landscape');
+      document.body.classList.toggle('native-lock', locked);
+    } else {
+      document.body.classList.remove('force-landscape', 'native-lock');
+      await exitForcedLandscape();
+    }
     refresh();
   });
-  
+    
     document.getElementById('debug-tag').addEventListener('click', async (e) => {
     e.stopPropagation(); // don't also trigger the invert-colors tap on #stage
     if ('serviceWorker' in navigator) {
